@@ -2,10 +2,10 @@
 // === 🔑 КОНФИГУРАЦИЯ API GEMINI (ОБЯЗАТЕЛЬНО К ЗАПОЛНЕНИЮ) ===
 // =======================================================================
 
-// !!! Ключ должен быть ТОЛЬКО в Cloudflare Worker !!!
+// !!! ВАШ КЛЮЧ ДОЛЖЕН БЫТЬ ТОЛЬКО В CLOUDFLARE WORKER !!!
 const GEMINI_API_KEY = ""; 
-// ЭТО ВАШ БЕЗОПАСНЫЙ АДРЕС:
-const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; // Ваш полный адрес
+// ЭТО ВАШ АДРЕС WORKER'А (замените на свой, если он изменился!)
+const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; 
 
 // =======================================================================
 // === ИНТЕРФЕЙС и ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ===
@@ -103,14 +103,14 @@ async function calculateResultsWithAI() {
     
     try {
         const response = await fetch(API_URL, {
-            method: 'POST',
+            method: 'POST', // <-- Обязательно POST!
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 config: {
-                    temperature: 0.7 // ✅ Увеличиваем температуру для надежности
+                    temperature: 0.7 // Увеличена для надежности
                 }
             })
         });
@@ -119,14 +119,14 @@ async function calculateResultsWithAI() {
             throw new Error(`Worker returned error: ${response.status}`);
         }
 
-        // 🛑 ИСПРАВЛЕНИЕ ОШИБКИ JSON: Безопасное чтение ответа
+        // БЕЗОПАСНОЕ ЧТЕНИЕ JSON (ИСПРАВЛЕНИЕ SyntaxError)
         const responseText = await response.text();
         if (!responseText || responseText.trim() === '') {
             throw new Error("Empty response body from Worker.");
         }
         const data = JSON.parse(responseText);
 
-        // ✅ Безопасный доступ к тексту
+        // Безопасный доступ к тексту
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!aiText) {
@@ -287,7 +287,7 @@ async function generateDetailedPlan(button, jobName) {
             body: JSON.stringify({
                 contents: [{ parts: [{ text: detailedPrompt }] }],
                 config: {
-                    temperature: 0.7 // ✅ Увеличиваем температуру для надежности
+                    temperature: 0.7 
                 }
             })
         });
@@ -296,14 +296,14 @@ async function generateDetailedPlan(button, jobName) {
             throw new Error(`Worker returned error: ${response.status}`);
         }
 
-        // 🛑 ИСПРАВЛЕНИЕ ОШИБКИ JSON: Безопасное чтение ответа
+        // БЕЗОПАСНОЕ ЧТЕНИЕ JSON (ИСПРАВЛЕНИЕ SyntaxError)
         const responseText = await response.text();
         if (!responseText || responseText.trim() === '') {
             throw new Error("Empty response body from Worker.");
         }
         const data = JSON.parse(responseText);
 
-        // ✅ Безопасный доступ к тексту
+        // Безопасный доступ к тексту
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!aiText) {
