@@ -295,7 +295,8 @@ async function generateDetailedPlan(button, jobName) {
         button.disabled = false;
     }
 }
-}
+
+
 
 
 
