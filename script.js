@@ -4,8 +4,9 @@
 
 // !!! ВСТАВЬТЕ СЮДА СВОЙ ЛИЧНЫЙ API-КЛЮЧ GEMINI !!!
 // Ключ должен быть внутри двойных кавычек.
-// ...
-const GEMINI_API_KEY = ""; 
+// !!! УДАЛЕН. КЛЮЧ ДОЛЖЕН БЫТЬ ТОЛЬКО В CLOUDFLARE WORKER !!!
+const GEMINI_API_KEY = ""; // Оставляем пустым
+
 // ЭТО ВАШ БЕЗОПАСНЫЙ АДРЕС:
 const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; // Ваш полный адрес
 // ...
@@ -96,6 +97,8 @@ function toggleRoadmap(button) {
  * Главная функция: делает первый API-запрос для получения ТОП-3 профессий
  */
 async function calculateResultsWithAI() {
+    const button = document.getElementById('quiz-form').querySelector('button[type="submit"]');
+
     // Собираем все ответы пользователя для отправки ИИ
     const form = new FormData(document.getElementById('quiz-form'));
     const answers = Object.fromEntries(form.entries());
@@ -111,21 +114,39 @@ async function calculateResultsWithAI() {
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 config: {
-                    temperature: 0.2
+                    temperature: 0.7 // Увеличиваем температуру для более успешной генерации
                 }
             })
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Worker returned error: ${response.status}`);
+        }
+
+        // БЕЗОПАСНОЕ ЧТЕНИЕ ОТВЕТА (предотвращает SyntaxError)
+        const responseText = await response.text();
+        if (!responseText || responseText.trim() === '') {
+            throw new Error("Empty response body from Worker.");
+        }
+        const data = JSON.parse(responseText);
+
+        // Проверка наличия контента
+        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         
-        const aiText = data.candidates[0].content.parts[0].text;
+        if (!aiText) {
+             throw new Error("AI did not generate text content or returned null data.");
+        }
+
         const htmlContent = parseAITextToHTML(aiText);
-        
         showResultScreen(htmlContent);
 
     } catch (error) {
         console.error("Ошибка при обращении к Gemini API:", error);
-        showResultScreen("<h3>К сожалению, произошла ошибка подключения к AI-модели. Пожалуйста, проверьте API-ключ.</h3>");
+        
+        const errorMessage = `<h3>К сожалению, произошла ошибка подключения к AI-модели.</h3><p>Причина: ${error.message}. Убедитесь, что ваш API-ключ в Cloudflare Worker и биллинг в Google Cloud активны.</p>`;
+        
+        showResultScreen(errorMessage);
+        button.textContent = 'Ошибка генерации. Попробуйте снова.';
     }
 }
 
@@ -244,6 +265,7 @@ async function generateDetailedPlan(button, jobName) {
     
     // 1. Показываем загрузку
     button.disabled = true;
+    const originalText = button.textContent;
     button.textContent = 'Генерация... Это может занять несколько секунд.';
 
     // 2. Создаем специальный промпт для 12-месячного плана
@@ -269,13 +291,27 @@ async function generateDetailedPlan(button, jobName) {
             body: JSON.stringify({
                 contents: [{ parts: [{ text: detailedPrompt }] }],
                 config: {
-                    temperature: 0.5 // Чуть выше, чтобы ИИ был более креативным
+                    temperature: 0.7 // Увеличиваем температуру для более успешной генерации
                 }
             })
         });
 
-        const data = await response.json();
-        const aiText = data.candidates[0].content.parts[0].text;
+        if (!response.ok) {
+            throw new Error(`Worker returned error: ${response.status}`);
+        }
+
+        // БЕЗОПАСНОЕ ЧТЕНИЕ ОТВЕТА (предотвращает SyntaxError)
+        const responseText = await response.text();
+        if (!responseText || responseText.trim() === '') {
+            throw new Error("Empty response body from Worker.");
+        }
+        const data = JSON.parse(responseText);
+
+        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!aiText) {
+             throw new Error("AI did not generate text content or returned null data.");
+        }
         
         // 3. Парсим и вставляем результат
         let htmlContent = aiText.replace(/## (.*?)\n/, '<h4>$1</h4>'); // Заголовок
@@ -290,15 +326,8 @@ async function generateDetailedPlan(button, jobName) {
         
     } catch (error) {
         console.error("Ошибка при генерации детального плана:", error);
-        button.textContent = 'Ошибка генерации. Попробуйте снова.';
+        button.textContent = `Ошибка: ${error.message}`;
     } finally {
         button.disabled = false;
     }
 }
-
-
-
-
-
-
-
