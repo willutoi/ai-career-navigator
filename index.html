@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Navigator for Teens</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="logo">🚀 AI Career Navigator <span>ULTIMATE</span></div>
+        <p>Ваш персональный AI-консультант по выбору профессии.</p>
+    </header>
+
+    <main>
+        <div id="welcome-screen" class="screen">
+            <div class="hero-content">
+                <h1 class="hero-title">Найди свою траекторию в мире 50 профессий.</h1>
+                <p class="hero-subtitle">
+                    Наш AI-алгоритм анализирует ваши склонности и сопоставляет их с требованиями рынка труда, чтобы найти ваш идеальный карьерный путь.
+                </p>
+                <button onclick="startQuiz()" class="primary-btn hero-btn">
+                    Начать Анализ 
+                </button>
+            </div>
+            
+            <div id="features" class="features-grid">
+                <div class="feature-item">
+                    <h3>🚀 50+ Профессий</h3>
+                    <p>Актуальная база знаний от IT до науки и креатива.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🧠 Умный Match</h3>
+                    <p>Анализ по 10 психометрическим параметрам.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🗺️ Детальный Roadmap</h3>
+                    <p>Пошаговый план действий, сгенерированный специально для вас.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="screen hidden">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <form id="quiz-form">
+                <h2>Опрос: Ваши интересы и стиль мышления</h2>
+                
+                <div class="question-block">
+                    <label>1. Что вы предпочтете делать с данными?</label>
+                    <select name="q1" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="create">Использовать для создания нового продукта/кода</option>
+                        <option value="analyze">Искать закономерности, строить прогнозы</option>
+                        <option value="ignore">Передавать другим, мне важнее общение</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>2. Какое хобби вам ближе?</label>
+                    <select name="q2" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="tech">Сборка ПК, робототехника, кодинг</option>
+                        <option value="art">Рисование, дизайн, музыка, фотография</option>
+                        <option value="social">Организация мероприятий, волонтерство</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>3. Какой предмет дается легче всего?</label>
+                    <select name="q3" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="math_it">Математика, Информатика, Физика</option>
+                        <option value="language">Языки, Литература, История</option>
+                        <option value="science">Биология, Химия, География</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>4. Как вы решаете сложную задачу?</label>
+                    <select name="q4" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="structured">Разбиваю на мелкие шаги, следую плану</option>
+                        <option value="intuitive">Действую по наитию, ищу нестандартные ходы</option>
+                        <option value="collaborative">Обсуждаю с командой, ищем коллективное решение</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>5. Что для вас важнее в работе?</label>
+                    <select name="q5" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="money">Высокий доход и статус</option>
+                        <option value="help">Помощь людям и реальная польза</option>
+                        <option value="interest">Сложность и интересность задач</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>6. В каком режиме работы вы чувствуете себя комфортнее?</label>
+                    <select name="q6" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="alone">Работаю в одиночку, сфокусировано</option>
+                        <option value="team_member">В команде, где есть четкий лидер</option>
+                        <option value="team_leader">Руковожу командой, отвечаю за результат</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>7. Как вы относитесь к риску?</label>
+                    <select name="q7" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="avoid">Стараюсь избегать риска, ценю стабильность</option>
+                        <option value="calculate">Готов рисковать, если все просчитал</option>
+                        <option value="embrace">Люблю высокий риск и неизвестность</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>8. Что вы делаете, когда получаете большой объем новой информации?</label>
+                    <select name="q8" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="structure">Сразу ищу систему, классифицирую</option>
+                        <option value="summarize">Быстро выделяю главное, игнорируя детали</option>
+                        <option value="discuss">Сразу обсуждаю с другими, ищу мнения</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>9. Что вам интереснее создавать?</label>
+                    <select name="q9" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="digital">Цифровой продукт (сайт, код, дизайн)</option>
+                        <option value="physical">Физический продукт (механизм, здание, еда)</option>
+                        <option value="service">Услугу/Опыт (консультация, мероприятие)</option>
+                    </select>
+                </div>
+
+                <div class="question-block">
+                    <label>10. Когда вы читаете текст, вы скорее...</label>
+                    <select name="q10" required onchange="updateProgress()">
+                        <option value="">Выберите вариант</option>
+                        <option value="detail">Замечаете грамматические ошибки и детали</option>
+                        <option value="big_picture">Понимаете общую идею и контекст</option>
+                        <option value="feeling">Запоминаете эмоциональный тон и атмосферу</option>
+                    </select>
+                </div>
+
+
+                <button type="submit" class="primary-btn">Отправить ответы и начать AI-анализ</button>
+            </form>
+        </div>
+
+        <div id="loading-screen" class="screen hidden">
+            <div class="spinner"></div>
+            <h2>AI-модель анализирует 40000+ карьерных путей...</h2>
+            <p id="loading-text">Ищем идеальное совпадение между вашим стилем мышления и требованиями рынка труда.</p>
+        </div>
+
+        <div id="result-screen" class="screen hidden">
+            <h2>🏆 Твои Топ-3 Профессии</h2>
+            <div id="results-container">
+                </div>
+            <p>© 2025 AI Career Navigator. Прототип MVP.</p>
+            <button onclick="location.reload()" class="secondary-btn">Пройти заново</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Функция startQuiz должна быть здесь, чтобы гарантированно работать, если script.js не загрузился.
+        // Но лучше, чтобы она была в script.js, чтобы не дублировать код. Я оставляю ее тут для надежности.
+        function startQuiz() {
+             document.getElementById('welcome-screen').classList.add('hidden');
+             document.getElementById('quiz-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

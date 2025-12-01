@@ -1,0 +1,201 @@
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --text: #111827;
+    --gray: #6b7280;
+    --success: #10b981;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: var(--card-bg);
+    padding: 1rem 5%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo { font-weight: 700; font-size: 1.2rem; }
+.logo span { color: var(--primary); background: #e0e7ff; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+
+main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+
+.screen {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.hidden { display: none; }
+
+h1 { margin-bottom: 0.5rem; }
+.stats { display: flex; justify-content: center; gap: 20px; margin: 2rem 0; color: var(--gray); font-weight: 500; }
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.primary-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+.secondary-btn {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* Форма */
+#quiz-form { text-align: left; }
+.question-block { margin-bottom: 1.5rem; }
+label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+select {
+    width: 100%; padding: 10px; border: 1px solid #d1d5db;
+    border-radius: 6px; font-size: 1rem; background: white;
+}
+
+/* Прогресс бар */
+.progress-container { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; margin-bottom: 2rem; }
+.progress-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+
+/* Загрузка */
+.spinner {
+    border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
+    border-radius: 50%; width: 40px; height: 40px;
+    animation: spin 1s linear infinite; margin: 0 auto 1rem;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Результаты */
+.career-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    transition: 0.3s;
+}
+.career-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+.career-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.score { font-weight: 700; color: var(--success); }
+.tag { font-size: 0.8rem; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; color: var(--gray); }
+
+/* Кнопка Roadmap */
+.roadmap-btn {
+    background: #111827;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.roadmap-btn:hover { background: #374151; }
+
+.roadmap-content {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid var(--primary);
+    font-size: 0.95rem;
+}
+.roadmap-step { margin-bottom: 8px; display: flex; gap: 10px; }
+.step-icon { color: var(--primary); font-weight: bold; }
+
+/* --- СТИЛИ ГЛАВНОЙ СТРАНИЦЫ (HERO & FEATURES) --- */
+
+.hero-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 3rem 0 2rem;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 2.5rem; 
+    font-weight: 900; 
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--gray);
+    margin-bottom: 2rem;
+}
+
+.hero-btn {
+    padding: 15px 40px; 
+    font-size: 1.1rem;
+    /* ИСПРАВЛЕНО: Теперь использует ваш фиолетовый цвет */
+    background: var(--primary); 
+    border-color: var(--primary);
+    transition: 0.3s;
+}
+
+.hero-btn:hover {
+    /* ИСПРАВЛЕНО: Теперь использует ваш цвет для hover */
+    background: var(--primary-hover);
+    transform: scale(1.02);
+}
+
+/* Сетка преимуществ */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb; 
+}
+
+.feature-item {
+    text-align: left;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.feature-item h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary); 
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.feature-item p {
+    font-size: 0.95rem;
+    color: var(--gray);
+}
+
+/* ЭТОТ КОНФЛИКТУЮЩИЙ БЛОК БЫЛ УДАЛЕН ИЛИ ИЗМЕНЕН, 
+   ЧТОБЫ КНОПКА .hero-btn ОСТАВАЛАСЬ ВИДИМОЙ */
