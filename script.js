@@ -1,6 +1,10 @@
 // === БАЗА ДАННЫХ: 50 ПРОФЕССИЙ ===
 // match: Набор идеальных ответов (ключ: значение) для 10 вопросов
-const DB = [
+// --- КОНФИГУРАЦИЯ ---
+// !!! ВСТАВЬТЕ СЮДА СВОЙ РЕАЛЬНЫЙ API-КЛЮЧ !!!
+const GEMINI_API_KEY = "AIzaSyDlf46A5gJNyHnUp3w_BE1pWTOV-v0hPOs"; // <--- Вот как это должно выглядеть
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
+// ...
     // --- IT & Tech (10) ---
     {n: "Frontend Разработчик", cat: "IT_CODE", match: {q1:"create", q2:"art", q3:"math_it", q4:"intuitive", q9:"digital", q10:"big_picture"}},
     {n: "Backend Разработчик", cat: "IT_CODE", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"digital", q6:"alone"}},
@@ -260,4 +264,5 @@ function toggleRoadmap(btn, jobName, cat) {
     contentDiv.innerHTML = htmlContent;
     contentDiv.classList.remove('hidden');
     btn.innerHTML = '❌ Скрыть Roadmap';
+
 }
