@@ -2,14 +2,10 @@
 // === 🔑 КОНФИГУРАЦИЯ API GEMINI (ОБЯЗАТЕЛЬНО К ЗАПОЛНЕНИЮ) ===
 // =======================================================================
 
-// !!! ВСТАВЬТЕ СЮДА СВОЙ ЛИЧНЫЙ API-КЛЮЧ GEMINI !!!
-// Ключ должен быть внутри двойных кавычек.
-// !!! УДАЛЕН. КЛЮЧ ДОЛЖЕН БЫТЬ ТОЛЬКО В CLOUDFLARE WORKER !!!
-const GEMINI_API_KEY = ""; // Оставляем пустым
-
+// !!! Ключ должен быть ТОЛЬКО в Cloudflare Worker !!!
+const GEMINI_API_KEY = ""; 
 // ЭТО ВАШ БЕЗОПАСНЫЙ АДРЕС:
 const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; // Ваш полный адрес
-// ...
 
 // =======================================================================
 // === ИНТЕРФЕЙС и ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ===
@@ -114,7 +110,7 @@ async function calculateResultsWithAI() {
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 config: {
-                    temperature: 0.7 // Увеличиваем температуру для более успешной генерации
+                    temperature: 0.7 // ✅ Увеличиваем температуру для надежности
                 }
             })
         });
@@ -123,14 +119,14 @@ async function calculateResultsWithAI() {
             throw new Error(`Worker returned error: ${response.status}`);
         }
 
-        // БЕЗОПАСНОЕ ЧТЕНИЕ ОТВЕТА (предотвращает SyntaxError)
+        // 🛑 ИСПРАВЛЕНИЕ ОШИБКИ JSON: Безопасное чтение ответа
         const responseText = await response.text();
         if (!responseText || responseText.trim() === '') {
             throw new Error("Empty response body from Worker.");
         }
         const data = JSON.parse(responseText);
 
-        // Проверка наличия контента
+        // ✅ Безопасный доступ к тексту
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!aiText) {
@@ -143,10 +139,10 @@ async function calculateResultsWithAI() {
     } catch (error) {
         console.error("Ошибка при обращении к Gemini API:", error);
         
-        const errorMessage = `<h3>К сожалению, произошла ошибка подключения к AI-модели.</h3><p>Причина: ${error.message}. Убедитесь, что ваш API-ключ в Cloudflare Worker и биллинг в Google Cloud активны.</p>`;
+        const errorMessage = `<h3>К сожалению, произошла ошибка подключения к AI-модели.</h3><p>Причина: ${error.message}. Убедитесь, что ваш API-ключ и Worker активны.</p>`;
         
         showResultScreen(errorMessage);
-        button.textContent = 'Ошибка генерации. Попробуйте снова.';
+        if (button) button.textContent = 'Ошибка генерации. Попробуйте снова.';
     }
 }
 
@@ -291,7 +287,7 @@ async function generateDetailedPlan(button, jobName) {
             body: JSON.stringify({
                 contents: [{ parts: [{ text: detailedPrompt }] }],
                 config: {
-                    temperature: 0.7 // Увеличиваем температуру для более успешной генерации
+                    temperature: 0.7 // ✅ Увеличиваем температуру для надежности
                 }
             })
         });
@@ -300,13 +296,14 @@ async function generateDetailedPlan(button, jobName) {
             throw new Error(`Worker returned error: ${response.status}`);
         }
 
-        // БЕЗОПАСНОЕ ЧТЕНИЕ ОТВЕТА (предотвращает SyntaxError)
+        // 🛑 ИСПРАВЛЕНИЕ ОШИБКИ JSON: Безопасное чтение ответа
         const responseText = await response.text();
         if (!responseText || responseText.trim() === '') {
             throw new Error("Empty response body from Worker.");
         }
         const data = JSON.parse(responseText);
 
+        // ✅ Безопасный доступ к тексту
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!aiText) {
