@@ -4,8 +4,11 @@
 
 // !!! ВСТАВЬТЕ СЮДА СВОЙ ЛИЧНЫЙ API-КЛЮЧ GEMINI !!!
 // Ключ должен быть внутри двойных кавычек.
+// ...
 const GEMINI_API_KEY = ""; 
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
+// ЭТО ВАШ БЕЗОПАСНЫЙ АДРЕС:
+const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; // Ваш полный адрес
+// ...
 
 // =======================================================================
 // === ИНТЕРФЕЙС и ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ===
@@ -293,6 +296,7 @@ async function generateDetailedPlan(button, jobName) {
     }
 }
 }
+
 
 
 
