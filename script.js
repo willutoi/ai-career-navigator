@@ -1,50 +1,34 @@
 // =======================================================================
-// === 🔑 КОНФИГУРАЦИЯ API GEMINI (ОБЯЗАТЕЛЬНО К ЗАПОЛНЕНИЮ) ===
+// === КОНФИГУРАЦИЯ API GEMINI (ОБЯЗАТЕЛЬНО ИЗМЕНИТЬ) ===
 // =======================================================================
-
-// !!! ВАШ КЛЮЧ ДОЛЖЕН БЫТЬ ТОЛЬКО В CLOUDFLARE WORKER !!!
-const GEMINI_API_KEY = ""; 
-// ЭТО ВАШ АДРЕС WORKER'А (замените на свой, если он изменился!)
-const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev"; 
-
-// =======================================================================
-// === ИНТЕРФЕЙС и ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ===
-// =======================================================================
+// ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+const API_URL = "https://cold-water-2c56.baqberqauratuly.workers.dev";
+// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+// Если создашь новый Worker — замени URL здесь
 
 const TOTAL_QUESTIONS = 10;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Обработка отправки формы для запуска теста
     const quizForm = document.getElementById('quiz-form');
-    quizForm.addEventListener('submit', function(event) {
+    quizForm.addEventListener('submit', function (event) {
         event.preventDefault();
         startLoadingScreen();
     });
 });
 
-/**
- * Переключает экран на тест
- */
 function startQuiz() {
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('quiz-screen').classList.remove('hidden');
     updateProgress();
 }
 
-/**
- * Обновляет прогресс-бар в зависимости от количества ответов
- */
 function updateProgress() {
     const form = document.getElementById('quiz-form');
-    const answeredCount = Array.from(form.querySelectorAll('select')).filter(select => select.value !== "").length;
-    
+    const answeredCount = Array.from(form.querySelectorAll('select')).filter(s => s.value !== "").length;
     const percentage = (answeredCount / TOTAL_QUESTIONS) * 100;
     document.getElementById('progress-bar').style.width = percentage + "%";
 }
 
-/**
- * Показывает экран загрузки и запускает логику ИИ после задержки
- */
 function startLoadingScreen() {
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('loading-screen').classList.remove('hidden');
@@ -52,280 +36,168 @@ function startLoadingScreen() {
     const phrases = ["Анализ психотипа...", "Формирование запроса к AI...", "Генерация Roadmap...", "Финальный расчет..."];
     let i = 0;
     const interval = setInterval(() => {
-        if(i < phrases.length) document.getElementById('loading-text').innerText = phrases[i++];
+        if (i < phrases.length) document.getElementById('loading-text').innerText = phrases[i++];
     }, 700);
 
     setTimeout(() => {
         clearInterval(interval);
-        calculateResultsWithAI(); // <-- ВЫЗЫВАЕМ ФУНКЦИЮ ИИ
-    }, 3000); // 3 секунды задержки
+        calculateResultsWithAI();
+    }, 3000);
 }
 
-/**
- * Переключает экран на результаты
- */
 function showResultScreen(htmlContent) {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     document.getElementById('results-container').innerHTML = htmlContent;
 }
 
-/**
- * Переключает видимость короткого Roadmap.
- */
 function toggleRoadmap(button) {
     const content = button.nextElementSibling;
     content.classList.toggle('hidden');
-    
-    if (content.classList.contains('hidden')) {
-        button.textContent = 'Посмотреть Roadmap (краткий)';
-    } else {
-        button.textContent = 'Скрыть Roadmap';
-    }
+    button.textContent = content.classList.contains('hidden') ? 'Посмотреть Roadmap (краткий)' : 'Скрыть Roadmap';
 }
 
-
-// =======================================================================
-// === 🧠 ФУНКЦИИ ИСКУССТВЕННОГО ИНТЕЛЛЕКТА (GEMINI API) ===
-// =======================================================================
-
-/**
- * Главная функция: делает первый API-запрос для получения ТОП-3 профессий
- */
+// === ГЛАВНАЯ ФУНКЦИЯ ОТПРАВКИ НА GEMINI ===
 async function calculateResultsWithAI() {
-    const button = document.getElementById('quiz-form').querySelector('button[type="submit"]');
-
-    // Собираем все ответы пользователя для отправки ИИ
     const form = new FormData(document.getElementById('quiz-form'));
     const answers = Object.fromEntries(form.entries());
-    
     const prompt = createAIPrompt(answers);
-    
+
     try {
         const response = await fetch(API_URL, {
-            method: 'POST', // <-- Обязательно POST!
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-  contents: [{ parts: [{ text: prompt }] }],
-  generationConfig: { temperature: 0.7 }
-})
-                }
+                contents: [{ parts: [{ text: prompt }] }]
+                // ← БЕЗ config и generationConfig — Worker сам добавит нужное
             })
         });
 
-        if (!response.ok) {
-            throw new Error(`Worker returned error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Worker error: ${response.status}`);
 
-        // БЕЗОПАСНОЕ ЧТЕНИЕ JSON (ИСПРАВЛЕНИЕ SyntaxError)
-        const responseText = await response.text();
-        if (!responseText || responseText.trim() === '') {
-            throw new Error("Empty response body from Worker.");
-        }
-        const data = JSON.parse(responseText);
-
-        // Безопасный доступ к тексту
+        const data = await response.json();
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!aiText) {
-             throw new Error("AI did not generate text content or returned null data.");
-        }
+
+        if (!aiText) throw new Error("AI не вернул текст");
 
         const htmlContent = parseAITextToHTML(aiText);
         showResultScreen(htmlContent);
 
     } catch (error) {
-        console.error("Ошибка при обращении к Gemini API:", error);
-        
-        const errorMessage = `<h3>К сожалению, произошла ошибка подключения к AI-модели.</h3><p>Причина: ${error.message}. Убедитесь, что ваш API-ключ и Worker активны.</p>`;
-        
-        showResultScreen(errorMessage);
-        if (button) button.textContent = 'Ошибка генерации. Попробуйте снова.';
+        console.error("Ошибка Gemini:", error);
+        showResultScreen(`
+            <h3>Ошибка подключения к AI</h3>
+            <p>${error.message}</p>
+            <p>Проверь Worker и ключ.</p>
+        `);
     }
 }
 
-/**
- * Формирует подробный запрос для модели ИИ, чтобы она знала, как ответить.
- */
-function createAIPrompt(answers) {
-    const formattedAnswers = JSON.stringify(answers, null, 2);
+// === ДЕТАЛЬНЫЙ ПЛАН (12 месяцев) ===
+async function generateDetailedPlan(button, jobName) {
+    const roadmapContainer = button.closest('.roadmap-content');
+    if (roadmapContainer.querySelector('.detailed-plan')) {
+        roadmapContainer.querySelector('.detailed-plan').classList.toggle('hidden');
+        return;
+    }
 
-    return `
-        Ты — высококвалифицированный AI-карьерный консультант для подростков. Твоя задача — проанализировать ответы на 10 вопросов и предложить ТОП-3 наиболее подходящих профессий.
+    button.disabled = true;
+    button.textContent = "Генерация...";
 
-        Твои результаты должны быть строго структурированы.
+    const detailedPrompt = `Сделай максимально практичный 12-месячный план развития для профессии "${jobName}" для подростка. Только список:\n## ${jobName}\n- Месяц 1: ...\n- Месяц 2: ... и т.д. до 12.`;
 
-        Используй следующую структуру для ответа, без лишних слов до и после:
-        
-        ### 1. [Название Профессии 1] | [Процент Соответствия] | [Категория]
-        [Краткое описание, почему эта профессия подходит]
-        * Шаг 1: [Короткий практический шаг]
-        * Шаг 2: [Короткий практический шаг]
-        * Шаг 3: [Короткий практический шаг]
-        ---
-        ### 2. [Название Профессии 2] | [Процент Соответствия] | [Категория]
-        [Краткое описание, почему эта профессия подходит]
-        * Шаг 1: [Короткий практический шаг]
-        * Шаг 2: [Короткий практический шаг]
-        * Шаг 3: [Короткий практический шаг]
-        ---
-        ### 3. [Название Профессии 3] | [Процент Соответствия] | [Категория]
-        [Краткое описание, почему эта профессия подходит]
-        * Шаг 1: [Короткий практический шаг]
-        * Шаг 2: [Короткий практический шаг]
-        * Шаг 3: [Короткий практический шаг]
-        
-        Пример категорий: IT, DESIGN, SCIENCE, MANAGEMENT, HUMANITIES.
-        Процент соответствия должен быть целым числом от 70 до 99.
-        
-        Вот ответы пользователя:
-        ${formattedAnswers}
-    `;
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: detailedPrompt }] }]
+            })
+        });
+
+        if (!response.ok) throw new Error(response.status);
+
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Ошибка генерации";
+
+        let html = text
+            .replace(/## (.*)/, '<h4>$1</h4>')
+            .replace(/- (.*)/g, '<div class="roadmap-step detailed"><span class="step-icon">★</span>$1</div>');
+
+        const div = document.createElement('div');
+        div.className = 'detailed-plan';
+        div.innerHTML = html;
+        roadmapContainer.appendChild(div);
+
+        button.textContent = "Скрыть детальный план";
+    } catch (e) {
+        button.textContent = "Ошибка";
+    } finally {
+        button.disabled = false;
+    }
 }
 
-/**
- * Парсит структурированный текст от ИИ в HTML-карточки.
- */
+// === ПРОМПТ И ПАРСИНГ ОТВЕТА ===
+function createAIPrompt(answers) {
+    const formatted = JSON.stringify(answers, null, 2);
+    return `
+Ты — карьерный консультант для подростков. На основе ответов дай ТОП-3 профессии.
+
+Формат ответа (строго!):
+### 1. [Название] | [Процент 70-99] | [Категория: IT/DESIGN/SCIENCE и т.д.]
+[Краткое объяснение]
+* Шаг 1: ...
+* Шаг 2: ...
+* Шаг 3: ...
+---
+### 2. ...
+---
+### 3. ...
+
+Ответы пользователя:
+${formatted}
+`;
+}
+
 function parseAITextToHTML(aiText) {
-    const blocks = aiText.trim().split('---').filter(block => block.trim() !== '');
+    const blocks = aiText.trim().split('---').filter(b => b.trim());
     let html = '';
 
     blocks.forEach(block => {
-        const lines = block.trim().split('\n').filter(line => line.trim() !== '');
-
-        if (lines.length < 2) return; 
+        const lines = block.trim().split('\n').filter(l => l.trim());
+        if (lines.length < 2) return;
 
         const header = lines[0].replace('###', '').trim();
-        const parts = header.split('|').map(p => p.trim());
+        const [title, score, tag] = header.split('|').map(s => s.trim());
+        const desc = lines[1].trim();
 
-        if (parts.length < 3) return;
-
-        const title = parts[0];
-        const score = parts[1];
-        const tag = parts[2];
-        
-        const description = lines[1].trim();
-
-        // Формируем КРАТКИЙ Roadmap (шаги начинаются с '*')
-        const roadmapSteps = lines.slice(2)
-            .filter(line => line.trim().startsWith('*'))
-            .map(line => {
-                const stepText = line.trim().substring(1).trim();
-                const formattedStep = stepText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                return `<div class="roadmap-step"><span class="step-icon">→</span>${formattedStep}</div>`;
+        const steps = lines.slice(2)
+            .filter(l => l.trim().startsWith('*'))
+            .map(l => {
+                const text = l.trim().substring(1).trim();
+                return `<div class="roadmap-step"><span class="step-icon">→</span>${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
             }).join('');
-        
+
         html += `
             <div class="career-card">
                 <div class="career-header">
                     <h3>${title}</h3>
                     <span class="score">${score}% Match</span>
                 </div>
-                <div class="tag">${tag}</span></div>
-                <p>${description}</p>
-                
-                <button class="roadmap-btn" onclick="toggleRoadmap(this)">
-                    Посмотреть Roadmap (краткий)
-                </button>
+                <div class="tag">${tag}</div>
+                <p>${desc}</p>
+                <button class="roadmap-btn" onclick="toggleRoadmap(this)">Посмотреть Roadmap (краткий)</button>
                 <div class="roadmap-content hidden">
                     <div class="short-roadmap">
-                        <h4>Краткий план действий:</h4>
-                        ${roadmapSteps}
+                        <h4>Краткий план:</h4>
+                        ${steps}
                         <button class="detailed-btn" onclick="generateDetailedPlan(this, '${title}')">
-                            Сгенерировать 12-Месячный План 🔥
+                            Сгенерировать 12-Месячный План
                         </button>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     });
 
-    return html;
+    return html || "<p>AI не смог сгенерировать ответ</p>";
 }
-
-/**
- * НОВАЯ ВОЗМОЖНОСТЬ: Делает второй API-запрос для генерации детального 12-месячного плана.
- */
-async function generateDetailedPlan(button, jobName) {
-    const roadmapContainer = button.closest('.roadmap-content');
-    const existingPlan = roadmapContainer.querySelector('.detailed-plan');
-    
-    // Предотвращаем повторную генерацию
-    if (existingPlan) {
-        existingPlan.classList.toggle('hidden');
-        button.textContent = existingPlan.classList.contains('hidden') ? 'Сгенерировать 12-Месячный План 🔥' : 'Скрыть Детальный План';
-        return;
-    }
-    
-    // 1. Показываем загрузку
-    button.disabled = true;
-    const originalText = button.textContent;
-    button.textContent = 'Генерация... Это может занять несколько секунд.';
-
-    // 2. Создаем специальный промпт для 12-месячного плана
-    const detailedPrompt = `
-        Сгенерируй детальный 12-месячный план обучения и развития для профессии "${jobName}". 
-        План должен быть максимально практичным и полезным для подростка.
-        
-        Используй следующую структуру (строго):
-        ## Годовой План Развития: ${jobName}
-        - Месяц 1: [Конкретные действия, что изучить и какой проект начать]
-        - Месяц 2: [Конкретные действия, что изучить и какой проект начать]
-        - Месяц 3: [Конкретные действия, что изучить и какой проект начать]
-        ...
-        - Месяц 12: [Итог и цель]
-    `;
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: detailedPrompt }] }],
-                config: {
-                    temperature: 0.7 
-                }
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Worker returned error: ${response.status}`);
-        }
-
-        // БЕЗОПАСНОЕ ЧТЕНИЕ JSON (ИСПРАВЛЕНИЕ SyntaxError)
-        const responseText = await response.text();
-        if (!responseText || responseText.trim() === '') {
-            throw new Error("Empty response body from Worker.");
-        }
-        const data = JSON.parse(responseText);
-
-        // Безопасный доступ к тексту
-        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!aiText) {
-             throw new Error("AI did not generate text content or returned null data.");
-        }
-        
-        // 3. Парсим и вставляем результат
-        let htmlContent = aiText.replace(/## (.*?)\n/, '<h4>$1</h4>'); // Заголовок
-        htmlContent = htmlContent.replace(/- (.*?)\n/g, '<div class="roadmap-step detailed"><span class="step-icon">★</span>$1</div>'); // Маркеры
-        
-        const detailedDiv = document.createElement('div');
-        detailedDiv.classList.add('detailed-plan');
-        detailedDiv.innerHTML = htmlContent;
-
-        roadmapContainer.appendChild(detailedDiv);
-        button.textContent = 'Скрыть Детальный План';
-        
-    } catch (error) {
-        console.error("Ошибка при генерации детального плана:", error);
-        button.textContent = `Ошибка: ${error.message}`;
-    } finally {
-        button.disabled = false;
-    }
-}
-
