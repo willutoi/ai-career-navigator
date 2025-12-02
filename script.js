@@ -4,9 +4,7 @@ const TOTAL_QUESTIONS = 10;
 
 // === ЗАПУСК ===
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#quiz-form select').forEach(select => {
-        select.addEventListener('change', updateProgress);
-    });
+    document.querySelectorAll('#quiz-form select').forEach(select => select.addEventListener('change', updateProgress));
 
     document.getElementById('quiz-form').addEventListener('submit', e => {
         e.preventDefault();
@@ -16,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === ПРОГРЕСС-БАР ===
 function updateProgress() {
-    const answered = Array.from(document.querySelectorAll('#quiz-form select'))
-        .filter(s => s.value !== "").length;
+    const answered = Array.from(document.querySelectorAll('#quiz-form select')).filter(s => s.value !== "").length;
     const percent = (answered / TOTAL_QUESTIONS) * 100;
     document.getElementById('progress-bar').style.width = percent + "%";
 }
