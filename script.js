@@ -4,8 +4,9 @@ const TOTAL_QUESTIONS = 10;
 
 // === ЗАПУСК ===
 document.addEventListener('DOMContentLoaded', () => {
-    const selects = document.querySelectorAll('#quiz-form select');
-    selects.forEach(select => select.addEventListener('change', updateProgress));
+    document.querySelectorAll('#quiz-form select').forEach(select => {
+        select.addEventListener('change', updateProgress);
+    });
 
     document.getElementById('quiz-form').addEventListener('submit', e => {
         e.preventDefault();
@@ -21,7 +22,7 @@ function updateProgress() {
     document.getElementById('progress-bar').style.width = percent + "%";
 }
 
-// === ЭКРАНЫ ===
+// === ЭКРАН ЗАГРУЗКИ ===
 function startLoadingScreen() {
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('loading-screen').classList.remove('hidden');
@@ -38,30 +39,32 @@ function startLoadingScreen() {
     }, 3000);
 }
 
+// === ПОКАЗ РЕЗУЛЬТАТОВ ===
 function showResultScreen(html) {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     document.getElementById('results-container').innerHTML = html;
 }
 
+// === РАСКРЫТИЕ ROADMAP ===
 function toggleRoadmap(btn) {
     const content = btn.nextElementSibling;
     content.classList.toggle('hidden');
     btn.textContent = content.classList.contains('hidden') ? 'Посмотреть Roadmap (краткий)' : 'Скрыть Roadmap';
 }
 
-// === ГЛАВНАЯ ЛОГИКА С OPENAI ===
+// === ЗАПРОС К GROK ===
 async function calculateResultsWithAI() {
     const form = new FormData(document.getElementById('quiz-form'));
     const answers = Object.fromEntries(form);
 
-    const userPrompt = `Ты — лучший карьерный консультант для подростков в России.
+    const prompt = `Ты — лучший карьерный консультант для подростков в России.
 
 На основе этих ответов дай ТОП-3 самых подходящих профессий.
-Ответ должен быть строго в таком формате:
 
+ОБЯЗАТЕЛЬНЫЙ формат ответа (ни слова лишнего):
 ### 1. Название профессии | 88% | (Категория)
-Краткое объяснение, почему подходит.
+Краткое объяснение почему подходит (2-3 предложения).
 * Шаг 1: ...
 * Шаг 2: ...
 * Шаг 3: ...
@@ -79,37 +82,28 @@ ${JSON.stringify(answers, null, 2)}`;
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 messages: [
-                    { role: "system", content: "Отвечай только по шаблону выше, на русском языке, без лишних слов." },
-                    { role: "user", content: userPrompt }
+                    { role: "system", content: "Отвечай строго по шаблону выше, только на русском, без приветствий и заключений." },
+                    { role: "user", content: prompt }
                 ]
             })
         });
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Worker вернул ${response.status}: ${text}`);
-        }
+        if (!response.ok) throw new Error(`Ошибка ${response.status}`);
 
         const data = await response.json();
         const text = data.choices[0].message.content;
 
-        const html = parseOpenAIResponse(text);
+        const html = parseResponse(text);
         showResultScreen(html);
 
     } catch (err) {
         console.error(err);
-        showResultScreen(`
-            <h3>Ошибка</h3>
-            <p>${err.message}</p>
-            <button onclick="location.reload()" style="padding:12px 24px;margin-top:20px;font-size:16px;">
-                Попробовать заново
-            </button>
-        `);
+        showResultScreen(`<h3>Ошибка</h3><p>${err.message}</p>`);
     }
 }
 
-// === ПАРСИНГ ОТВЕТА В КРАСИВЫЕ КАРТОЧКИ ===
-function parseOpenAIResponse(text) {
+// === ПАРСИНГ ОТВЕТА ===
+function parseResponse(text) {
     const blocks = text.trim().split('---').map(b => b.trim()).filter(b => b);
     let html = '';
 
@@ -117,17 +111,14 @@ function parseOpenAIResponse(text) {
         const lines = block.split('\n').map(l => l.trim()).filter(l => l);
         if (lines.length < 3) return;
 
-        const header = lines[0].replace('###', '').trim();
-        const [titlePart, score, category] = header.split('|').map(s => s.trim());
-        const title = titlePart.trim();
-        const description = lines[1];
+        const header = lines[0].replace(/^###\s*\d+\.\s*/, '').trim();
+        const [title, score, category] = header.split('|').map(s => s.trim());
+        const desc = lines[1];
 
         const steps = lines.slice(2)
             .filter(l => l.startsWith('*'))
-            .map(l => {
-                const step = l.replace(/^\*\s*/, '').trim();
-                return `<div class="roadmap-step"><span class="step-icon">→</span>${step.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
-            }).join('');
+            .map(l => `<div class="roadmap-step"><span class="step-icon">→</span>${l.replace(/^\*\s*/, '').trim()}</div>`)
+            .join('');
 
         html += `
             <div class="career-card">
@@ -136,10 +127,8 @@ function parseOpenAIResponse(text) {
                     <span class="score">${score}</span>
                 </div>
                 <div class="tag">${category}</div>
-                <p>${description}</p>
-                <button class="roadmap-btn" onclick="toggleRoadmap(this)">
-                    Посмотреть Roadmap (краткий)
-                </button>
+                <p>${desc}</p>
+                <button class="roadmap-btn" onclick="toggleRoadmap(this)">Посмотреть Roadmap (краткий)</button>
                 <div class="roadmap-content hidden">
                     <div class="short-roadmap">
                         <h4>Краткий план действий:</h4>
@@ -149,5 +138,5 @@ function parseOpenAIResponse(text) {
             </div>`;
     });
 
-    return html || "<p>Не удалось сгенерировать ответ.</p>";
+    return html || "<p>ИИ не смог дать ответ :(</p>";
 }
