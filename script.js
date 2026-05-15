@@ -72,6 +72,49 @@ const DB = [
     {n: "Специалист по охране труда (ОТ)", cat: "ENG", match: {q1:"analyze", q2:"tech", q3:"science", q4:"structured", q7:"avoid", q10:"detail"}},
     {n: "Веб-аналитик (SEO)", cat: "MKT", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"digital", q6:"alone"}},
     {n: "Агроном", cat: "SCI", match: {q1:"analyze", q2:"tech", q3:"science", q4:"structured", q9:"physical", q7:"avoid"}},
+        // === Новые добавленные профессии ===
+
+    // IT & Tech +
+    {n: "Blockchain Разработчик", cat: "IT_CODE", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"digital", q7:"embrace"}},
+    {n: "Cloud Engineer", cat: "IT_SYS", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"digital", q6:"alone"}},
+    {n: "Fullstack Разработчик", cat: "IT_CODE", match: {q1:"create", q2:"tech", q3:"math_it", q4:"intuitive", q9:"digital", q6:"team_member"}},
+    {n: "Prompt Engineer", cat: "IT_DATA", match: {q1:"create", q2:"art", q3:"language", q4:"intuitive", q9:"digital", q8:"summarize"}},
+
+    // Marketing & Digital +
+    {n: "SEO Специалист", cat: "MKT", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"digital", q8:"structure"}},
+    {n: "Performance Маркетолог", cat: "MKT", match: {q1:"analyze", q2:"social", q3:"math_it", q4:"structured", q5:"money", q7:"calculate"}},
+    {n: "Контент-Мейкер", cat: "MEDIA", match: {q1:"create", q2:"art", q3:"language", q4:"intuitive", q9:"digital", q6:"alone"}},
+
+    // Business & Finance +
+    {n: "Финансовый Консультант", cat: "FIN", match: {q1:"analyze", q2:"social", q3:"math_it", q4:"structured", q5:"money", q8:"summarize"}},
+    {n: "Data Analyst (Бизнес)", cat: "IT_DATA", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q8:"structure", q7:"calculate"}},
+    {n: "Startup Founder", cat: "BIZ_OWN", match: {q1:"create", q2:"social", q4:"intuitive", q6:"team_leader", q5:"money", q7:"embrace"}},
+
+    // Creative +
+    {n: "Иллюстратор", cat: "ART", match: {q1:"create", q2:"art", q3:"language", q4:"intuitive", q9:"digital", q6:"alone"}},
+    {n: "Sound Дизайнер", cat: "ART", match: {q1:"create", q2:"art", q3:"math_it", q4:"intuitive", q9:"digital", q5:"interest"}},
+    {n: "VFX Artist", cat: "ART", match: {q1:"create", q2:"art", q3:"math_it", q4:"intuitive", q9:"digital", q7:"embrace"}},
+
+    // Engineering & Science +
+    {n: "Электроинженер", cat: "ENG", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"physical", q7:"avoid"}},
+    {n: "Робототехник", cat: "ENG", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q9:"physical", q5:"interest"}},
+    {n: "Генетик", cat: "SCI", match: {q1:"analyze", q2:"tech", q3:"science", q4:"structured", q5:"help", q6:"alone"}},
+    {n: "Нейробиолог", cat: "SCI", match: {q1:"analyze", q2:"tech", q3:"science", q4:"structured", q5:"interest", q8:"structure"}},
+
+    // Health & Social +
+    {n: "Медсестра/Медбрат", cat: "MED", match: {q1:"ignore", q2:"social", q3:"science", q4:"collaborative", q5:"help", q6:"team_member"}},
+    {n: "Нутрициолог", cat: "MED", match: {q1:"analyze", q2:"social", q3:"science", q4:"intuitive", q5:"help", q9:"service"}},
+    {n: "Карьерный Консультант", cat: "EDU", match: {q1:"ignore", q2:"social", q3:"language", q4:"collaborative", q5:"help", q10:"big_picture"}},
+
+    // Other popular +
+    {n: "SMM-менеджер (продвинутый)", cat: "MKT", match: {q1:"create", q2:"social", q4:"intuitive", q9:"digital", q6:"team_member", q5:"money"}},
+    {n: "Трейдер", cat: "FIN", match: {q1:"analyze", q2:"tech", q3:"math_it", q4:"structured", q5:"money", q7:"embrace"}},
+    {n: "Event-технолог", cat: "ORG", match: {q1:"create", q2:"social", q4:"collaborative", q6:"team_leader", q9:"physical", q7:"embrace"}},
+    {n: "Киберспортсмен / Стример", cat: "MEDIA", match: {q1:"create", q2:"social", q4:"intuitive", q9:"digital", q5:"interest", q10:"feeling"}},
+    {n: "Логопед", cat: "MED_PSY", match: {q1:"ignore", q2:"social", q3:"language", q4:"collaborative", q5:"help", q10:"feeling"}},
+    {n: "Туроператор", cat: "ORG", match: {q1:"create", q2:"social", q4:"intuitive", q9:"service", q5:"freedom", q6:"team_member"}},
+    {n: "Бариста / Кофейный эксперт", cat: "CRAFT", match: {q1:"create", q2:"art", q3:"science", q4:"intuitive", q9:"physical", q6:"team_member"}},
+    {n: "Автомеханик", cat: "CRAFT", match: {q1:"fix", q2:"tech", q3:"math_it", q4:"structured", q9:"physical", q7:"avoid"}},
 ];
 
 // === СЛОВАРЬ КАТЕГОРИЙ для ПОЛЬЗОВАТЕЛЬСКОГО ВЫВОДА (Расширенный) ===
